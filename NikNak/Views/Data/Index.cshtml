@@ -1,0 +1,22 @@
+﻿@model NikNak.ViewModels.FitBitDataViewModel
+
+@{
+    ViewBag.Title = "title";
+}
+
+<h2>Data feed from fitbit</h2>
+
+<h3>User: @Model.UserName</h3>
+@foreach(var dataItem in Model.Activities)
+{
+    <p>Date: @dataItem.Date | ActivityType: @dataItem.ActivityTypeName</p>
+}
+
+
+<a class="btn btn-primary btn-large" id="get-chart" href="@Url.Action("GetChart", "Data")">Graph It »</a>
+
+<div id="chart-area">
+    @{
+        this.Html.RenderPartial("_Chart");
+    }
+</div>
