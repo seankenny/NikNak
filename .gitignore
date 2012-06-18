@@ -1,6 +1,24 @@
 # Build Folders (you can keep bin if you'd like, to store dlls and pdbs)
-bin
-obj
+[Oo]bj
+[Bb]in
 
 # mstest test results
 TestResults
+
+# Visual Studio
+[Dd]ebug/
+[Rr]elease/
+*.sln.cache
+*.suo
+*.user
+*.log 
+*.DS_Store
+[Tt]humbs.db 
+
+# Resharper
+_ReSharper.*
+*.resharper
+*resharper.user
+
+# Don't include NuGet Packages
+packages/
