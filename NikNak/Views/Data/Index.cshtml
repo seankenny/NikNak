@@ -15,8 +15,21 @@
 
 <a class="btn btn-primary btn-large" id="get-chart" href="@Url.Action("GetChart", "Data")">Graph It »</a>
 
-<div id="chart-area">
-    @{
-        this.Html.RenderPartial("_Chart");
-    }
+<div id="chart-area" class="hide row">
+    <div id="chart" class="span10"></div>
+    <div id="charttype" class="span2">
+        
+        <div>
+            <a class="set-chart-type" href="@Url.Action("GetChart", "Data", new { type = 17 })">View as Pie</a>
+        </div>
+        <div>
+            <a class="set-chart-type" href="@Url.Action("GetChart", "Data", new { type = 2 })">View as Bubble</a>
+        </div>
+        <div>
+            <a class="set-chart-type" href="@Url.Action("GetChart", "Data", new { type = 5 })">View as Line</a>
+        </div>
+        <div>
+            <a class="set-chart-type" href="@Url.Action("GetChart", "Data", new { type = 7 })">View as Bar</a>
+        </div>
+    </div>
 </div>

@@ -8,35 +8,31 @@ namespace NikNak.Services
 {
     public class ChartingService
     {
-        public MemoryStream BuildChart( )
+        public MemoryStream BuildChart(int? type, IDictionary<string, float> dataPoints)
         {
-            // slug in some data
-            var data = new Dictionary<string, float>
-                {
-                    { "test", 10.023f },
-                    { "test2", 20.020f },
-                    { "test3", 19.203f },
-                    { "test4", 4.039f },
-                    { "test5", 5.343f }
-                };
-
+            // default to line
+            var chartType = type == null ? SeriesChartType.Line : (SeriesChartType)type;
 
             var chart = new Chart();
             
             // configure your chart area (dimensions, etc) here.
             var area = new ChartArea();
             chart.ChartAreas.Add(area);
-
+            TickMark tm = new TickMark();
+           
             // create and customize your data series.
             var series = new Series();
-            foreach (var item in data)
+            foreach (var item in dataPoints)
             {
                 series.Points.AddXY(item.Key, item.Value);
             }
-            series.Label = "#PERCENT{P0}";
+            
+            //series.Label = "#PERCENT{P0}";
             series.Font = new Font("Segoe UI", 8.0f, FontStyle.Bold);
-            series.ChartType = SeriesChartType.Pie;
+            series.ChartType = chartType;
             series["PieLabelStyle"] = "Outside";
+            
+            
 
             chart.Series.Add(series);
 
@@ -44,6 +40,7 @@ namespace NikNak.Services
             chart.ImageType = ChartImageType.Png;
             chart.SaveImage(returnStream);
             returnStream.Position = 0;
+
             return returnStream;
         }
     }
