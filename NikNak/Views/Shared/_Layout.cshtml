@@ -53,6 +53,8 @@
 
         @*@Scripts.Render("~/bundles/jquery")*@
         <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+        <script type="text/javascript" src="@Url.Content("~/Scripts/highcharts.js")"></script>
+        <script type="text/javascript" src="@Url.Content("~/Scripts/exporting.js")"></script>
         <script type="text/javascript" src="@Url.Content("~/Scripts/NikNak.js")"></script>
         @RenderSection("scripts", required: false)
     </body>

@@ -6,7 +6,7 @@ using System.Web.UI.DataVisualization.Charting;
 
 namespace NikNak.Services
 {
-    public class ChartingService
+    public class ChartingService : IChartingService
     {
         public MemoryStream BuildChart(int? type, IDictionary<string, float> dataPoints)
         {

@@ -1,27 +1,35 @@
 ﻿using System.Collections.Generic;
 using System.Web.Mvc;
 
+using NikNak.Services;
+
 namespace NikNak.Controllers
 {
     public class DataController : Controller
     {
-        //
-        // GET: /Data/
+        private IFitBitApi fitbitService;
+        private IChartingService chartingService;
+        private IBloodMonitorService bloodMonitorService;
 
+        public DataController(IFitBitApi fitbitService, IChartingService chartingService, IBloodMonitorService bloodMonitorService)
+        {
+            this.fitbitService = fitbitService;
+            this.chartingService = chartingService;
+            this.bloodMonitorService = bloodMonitorService;
+        }
+
+        // display some stuff
         public ActionResult Index()
         {
             // get the fitbit feed
-            var service = new Services.FitBitApi();
-
-            var viewModel = service.GetFitBitData();
+            var viewModel = fitbitService.GetFitBitData();
 
             return View(viewModel);
         }
 
+        // MS charting...
         public FileStreamResult GetChart(int? type)
         {
-            var service = new Services.ChartingService();
-
             // slug in some data
             var data = new Dictionary<string, float>
                 {
@@ -43,10 +51,16 @@ namespace NikNak.Controllers
 
                 };
 
-            var chart = service.BuildChart(type, data);
+            var chart = chartingService.BuildChart(type, data);
 
             return new FileStreamResult(chart, "image/png");
         }
 
+        // raphael
+        public string GetChartData()
+        {
+            var data = bloodMonitorService.GetData();
+            return string.Join(",", data);
+        }
     }
 }

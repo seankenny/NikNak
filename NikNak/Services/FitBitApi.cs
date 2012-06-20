@@ -5,7 +5,7 @@ using NikNak.ViewModels;
 
 namespace NikNak.Services
 {
-    public class FitBitApi
+    public class FitBitApi : IFitBitApi
     {
         public FitBitDataViewModel GetFitBitData( )
         {
