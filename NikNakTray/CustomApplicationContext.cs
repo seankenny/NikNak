@@ -4,9 +4,6 @@ using System.Drawing;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Forms;
-
-using Dolinay;
-
 using NikNakTray.Properties;
 
 namespace NikNakTray
@@ -16,38 +13,20 @@ namespace NikNakTray
         private IContainer components;
         private NotifyIcon notifyIcon;
         private Window aboutForm;
-        private DriveDetector driveDetector = null;
+        private UsbDetector _usbDetector = null;
 
         public CustomApplicationContext()
         {
             this.InitializeContext();
-            driveDetector = new DriveDetector();
+            _usbDetector = new UsbDetector();
 
-            driveDetector.IPhoneAttached += new DriveDetectorEventHandler(OnIPhoneAttached);
+            _usbDetector.DeviceAttached += new DriveDetectorEventHandler(OnIPhoneAttached);
 
-            driveDetector.DeviceArrived += new DriveDetectorEventHandler(OnDriveArrived);
-            driveDetector.DeviceRemoved += new DriveDetectorEventHandler(OnDriveRemoved);
-            driveDetector.QueryRemove += new DriveDetectorEventHandler(OnQueryRemove);
         }
 
         private void OnIPhoneAttached(object sender, DriveDetectorEventArgs e)
         {
             SyncData_Click(sender, e);
-        }
-
-        private void OnQueryRemove(object sender, DriveDetectorEventArgs e)
-        {
-            throw new NotImplementedException();
-        }
-
-        private void OnDriveRemoved(object sender, DriveDetectorEventArgs e)
-        {
-            throw new NotImplementedException();
-        }
-
-        private void OnDriveArrived(object sender, DriveDetectorEventArgs e)
-        {
-            throw new NotImplementedException();
         }
 
         private void InitializeContext()

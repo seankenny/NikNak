@@ -19,6 +19,3 @@ TestResults
 _ReSharper.*
 *.resharper
 *resharper.user
-
-# Don't include NuGet Packages
-packages/
