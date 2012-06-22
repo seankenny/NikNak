@@ -7,9 +7,9 @@ namespace NikNakTray
     /// <summary>
     /// Interaction logic for About.xaml
     /// </summary>
-    public partial class About : Window
+    public partial class Sync : Window
     {
-        public About()
+        public Sync()
         {
             InitializeComponent();
         }

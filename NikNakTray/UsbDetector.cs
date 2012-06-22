@@ -1,29 +1,31 @@
 ﻿using System;
 using System.Collections;
 using System.Management;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
 namespace NikNakTray
 {
     // Delegate for event handler to handle the device events 
-    public delegate void DriveDetectorEventHandler(Object sender, DriveDetectorEventArgs e);
+    public delegate void UsbDetectorEventHandler(Object sender, UsbDetectorEventArgs e);
 
     internal class UsbDetector : IDisposable
     {
         // Win32 constants
-        private const int DBT_IPHONE_HANDLE = 7;
+        private const int DBT_USB_HANDLE = 7;
+        private const int DBT_DEVICEREMOVECOMPLETE = 0x8004; // removed 
         private const int WM_DEVICECHANGE = 0x0219;
-        //private GetFriendlyNameListDelegate _mDeleg;
+
         private delegate ArrayList GetFriendlyNameListDelegate();
 
         // Handle of the window which receives messages from Windows. This will be a form.
         private IntPtr mRecipientHandle;
-        private GetFriendlyNameListDelegate _nameDelegate;
-        public event DriveDetectorEventHandler DeviceAttached;
+        public event UsbDetectorEventHandler DeviceAttached;
+        public event UsbDetectorEventHandler DeviceRemoved;
 
         public UsbDetector()
         {
-            var frm = new DetectorForm(this);
+            var frm = new UsbDetectorForm(this);
             frm.Show(); // will be hidden immediatelly
             mRecipientHandle = frm.Handle;
         }
@@ -39,77 +41,44 @@ namespace NikNakTray
                 // WM_DEVICECHANGE can have several meanings depending on the WParam value...
                 switch (m.WParam.ToInt32())
                 {
-                    case DBT_IPHONE_HANDLE:
-                         
-                        //_nameDelegate = new GetFriendlyNameListDelegate(GetFriendlyNameListBegin);
-                        //AsyncCallback callback = GetFriendlyNameListEnd;
-
-                        // invoke the thread that will handle getting the friendly names  
-                        //_nameDelegate.BeginInvoke(callback, new object());
-                        var properties = GetFriendlyNameListBegin();
-                        if(properties.Count > 0)
+                    case DBT_USB_HANDLE:
+                        var device = GetConnectedDevice();
+                        if (device != null && DeviceAttached != null)
                         {
-                            DeviceAttached(this, new DriveDetectorEventArgs());
+                            DeviceAttached(this, new UsbDetectorEventArgs(device));
                         }
+                        break;
+
+                    case DBT_DEVICEREMOVECOMPLETE:
+                        if (DeviceRemoved != null)
+                            DeviceRemoved(this, new UsbDetectorEventArgs());
                         break;
                 }
             }
         }
 
-        //public void MyTaskAsync(string[] files)
-        //{
-        //    MyTaskWorkerDelegate worker = new MyTaskWorkerDelegate(MyTaskWorker);
-        //    AsyncCallback completedCallback = new AsyncCallback(MyTaskCompletedCallback);
-
-        //    lock (_sync)
-        //    {
-        //        if (_myTaskIsRunning)
-        //            throw new InvalidOperationException("The control is currently busy.");
-
-        //        AsyncOperation async = AsyncOperationManager.CreateOperation(null);
-        //        worker.BeginInvoke(files, completedCallback, async);
-        //        _myTaskIsRunning = true;
-        //    }
-        //}
-
-        //private readonly object _sync = new object();
-
-        // function queries the system using WMI and gets an arraylist of all com port devices     
-        private ArrayList GetFriendlyNameListBegin()
+        // function queries the system using WMI and returns the relevant device
+        private ManagementBaseObject GetConnectedDevice()
         {
-            var deviceList = new ArrayList();
-
-            var searcher = new ManagementObjectSearcher("Select * from Win32_PnpEntity");
-
-            foreach (var devices in searcher.Get())
+            using(var searcher = new ManagementObjectSearcher("Select * from Win32_PnpEntity"))
             {
-                var nameProperty = devices.GetPropertyValue("Name");
-
-                if (nameProperty == null)
+                foreach (var device in searcher.Get())
                 {
-                    continue;
-                }
+                    var nameProperty = device.GetPropertyValue("Name");
 
-                if (nameProperty.ToString().ToLower().Contains("usb") &&
-                    nameProperty.ToString().ToLower().Contains("abbott"))
-                {
-                    deviceList.Add(devices);
+                    if (nameProperty == null)
+                    {
+                        continue;
+                    }
+
+                    if (nameProperty.ToString().ToLower().Contains("usb")
+                        && nameProperty.ToString().ToLower().Contains("abbott"))
+                    {
+                        return device;
+                    }
                 }
             }
-
-            searcher.Dispose();
-            return deviceList;
-        }
-
-        private void GetFriendlyNameListEnd(IAsyncResult ar)
-        {
-            // got the returned arrayList, now we can do whatever with it  
-            var result = _nameDelegate.EndInvoke(ar);
-
-            if (result.Count > 0)
-            {
-                DeviceAttached(this, new DriveDetectorEventArgs());
-            }
+            return null;
         }
     }
 }
