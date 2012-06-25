@@ -13,15 +13,15 @@ namespace NikNakTray
     {
         // Win32 constants
         private const int DBT_USB_HANDLE = 7;
-        private const int DBT_DEVICEREMOVECOMPLETE = 0x8004; // removed 
-        private const int WM_DEVICECHANGE = 0x0219;
-
-        private delegate ArrayList GetFriendlyNameListDelegate();
+        
+        private const int WM_DEVICECHANGE = 0x0219; // attached/removed
+        public const int DEVICE_ARRIVAL = 0x8000;  // device attached
+        public const int DEVICE_REMOVECOMPLETE = 0x8004;  // device removed
 
         // Handle of the window which receives messages from Windows. This will be a form.
         private IntPtr mRecipientHandle;
-        public event UsbDetectorEventHandler DeviceAttached;
-        public event UsbDetectorEventHandler DeviceRemoved;
+        public event UsbDetectorEventHandler OnDeviceAttached;
+        public event UsbDetectorEventHandler OnDeviceRemoved;
 
         public UsbDetector()
         {
@@ -41,17 +41,17 @@ namespace NikNakTray
                 // WM_DEVICECHANGE can have several meanings depending on the WParam value...
                 switch (m.WParam.ToInt32())
                 {
-                    case DBT_USB_HANDLE:
-                        var device = GetConnectedDevice();
-                        if (device != null && DeviceAttached != null)
+                    case DEVICE_ARRIVAL:
+                        if (OnDeviceAttached != null)
                         {
-                            DeviceAttached(this, new UsbDetectorEventArgs(device));
+                            var device = GetConnectedDevice();
+                            OnDeviceAttached(this, new UsbDetectorEventArgs(device));
                         }
                         break;
 
-                    case DBT_DEVICEREMOVECOMPLETE:
-                        if (DeviceRemoved != null)
-                            DeviceRemoved(this, new UsbDetectorEventArgs());
+                    case DEVICE_REMOVECOMPLETE:
+                        if (OnDeviceRemoved != null)
+                            OnDeviceRemoved(this, new UsbDetectorEventArgs());
                         break;
                 }
             }
@@ -60,22 +60,26 @@ namespace NikNakTray
         // function queries the system using WMI and returns the relevant device
         private ManagementBaseObject GetConnectedDevice()
         {
-            using(var searcher = new ManagementObjectSearcher("Select * from Win32_PnpEntity"))
+            //HIDDevice.interfaceDetails[] devices = HIDDevice.getConnectedDevices(); 
+            ComPort cp = new ComPort();
+            cp.Initialise();
+
+            using(var searcher = new ManagementObjectSearcher("Select * from Win32_PnpEntity WHERE PNPDeviceID LIKE '%VID[_]1A61&PID[_]3420%'"))
             {
                 foreach (var device in searcher.Get())
                 {
                     var nameProperty = device.GetPropertyValue("Name");
+                    var vendorId = device.GetPropertyValue("PNPDeviceID");
+                    var deviceId = device.GetPropertyValue("DeviceID");
 
                     if (nameProperty == null)
                     {
                         continue;
                     }
 
-                    if (nameProperty.ToString().ToLower().Contains("usb")
-                        && nameProperty.ToString().ToLower().Contains("abbott"))
-                    {
-                        return device;
-                    }
+
+
+                    return device;
                 }
             }
             return null;

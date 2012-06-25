@@ -22,11 +22,11 @@ namespace NikNakTray
             this.InitializeContext();
             
             this.usbDetector = new UsbDetector();
-            this.usbDetector.DeviceAttached += this.OnUsbDeviceAttached;
-            this.usbDetector.DeviceRemoved += this.OnUsbDeviceRemoved;
+            this.usbDetector.OnDeviceAttached += this.OnUsbOnDeviceAttached;
+            this.usbDetector.OnDeviceRemoved += this.OnUsbOnDeviceRemoved;
         }
 
-        private void OnUsbDeviceAttached(object sender, UsbDetectorEventArgs e)
+        private void OnUsbOnDeviceAttached(object sender, UsbDetectorEventArgs e)
         {
             if (deviceConnectedForm == null)
             {
@@ -40,7 +40,7 @@ namespace NikNakTray
             }
         }
 
-        private void OnUsbDeviceRemoved(object sender, UsbDetectorEventArgs e)
+        private void OnUsbOnDeviceRemoved(object sender, UsbDetectorEventArgs e)
         {
             if (deviceConnectedForm != null)
             {

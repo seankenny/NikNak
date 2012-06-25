@@ -52,6 +52,7 @@
     <Compile Include="About.xaml.cs">
       <DependentUpon>About.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ComPort.cs" />
     <Compile Include="Sync.xaml.cs">
       <DependentUpon>Sync.xaml</DependentUpon>
     </Compile>
@@ -67,6 +68,12 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="USBClass.cs" />
+    <Compile Include="UsbLib\comms.cs" />
+    <Compile Include="UsbLib\Globals.cs" />
+    <Compile Include="UsbLib\HU320.cs" />
+    <Compile Include="UsbLib\Sections.cs" />
+    <Compile Include="UsbLib\USBInterface.cs" />
+    <Compile Include="UsbLib\Utilities.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
