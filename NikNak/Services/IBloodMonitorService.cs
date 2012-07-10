@@ -4,6 +4,6 @@ namespace NikNak.Services
 {
     public interface IBloodMonitorService
     {
-        ICollection<decimal> GetData();
+        ICollection<double> GetData();
     }
 }

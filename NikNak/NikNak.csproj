@@ -39,6 +39,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Dapper">
+      <HintPath>..\packages\Dapper.1.10\lib\net40\Dapper.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Ninject">
       <HintPath>..\packages\Ninject.3.0.1.10\lib\net40\Ninject.dll</HintPath>
@@ -51,6 +54,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Data.SqlServerCe, Version=4.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Web.DataVisualization" />
     <Reference Include="System.Web.DynamicData" />
@@ -127,8 +131,10 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\BloodGlucoseReading.cs" />
     <Compile Include="Models\FitBitData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Content Include="App_Data\Database1.sdf" />
     <Content Include="Scripts\exporting.js" />
     <Content Include="Scripts\highcharts.js" />
     <Content Include="Scripts\NikNak.js" />
@@ -163,9 +169,7 @@
     </Content>
     <Content Include="Views\Web.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="App_Data\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Content Include="packages.config" />
   </ItemGroup>

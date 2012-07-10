@@ -1,10 +1,17 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Data.Common;
+using System.Data.SqlClient;
 using System.Web.Mvc;
-
+using Dapper;
 using NikNak.Services;
+
 
 namespace NikNak.Controllers
 {
+    using System.Configuration;
+    using System.Data.SqlServerCe;
+
     public class DataController : Controller
     {
         private IFitBitApi fitbitService;
@@ -62,5 +69,49 @@ namespace NikNak.Controllers
             var data = bloodMonitorService.GetData();
             return string.Join(",", data);
         }
+
+        [HttpGet]
+        public JsonResult Data(string data)
+        {
+            //var dbFactory = new OrmLiteConnectionFactory(@"Data Source=.\SQLEXPRESS;AttachDbFilename=|DataDirectory|\App_Data\Database1.mdf;Integrated Security=True;User Instance=True");
+
+            //Use in-memory Sqlite DB instead
+            //var dbFactory = new OrmLiteConnectionFactory(
+            //    ":memory:", false, SqliteOrmLiteDialectProvider.Instance);
+
+            //Non-intrusive: All extension methods hang off System.Data.* interfaces
+            //IDbConnection dbConn = dbFactory.OpenDbConnection();
+            //IDbCommand dbCmd = dbConn.CreateCommand();
+
+            //dbCmd.CreateTable<BloodGlucoseReading>();
+
+            using (var connection = ConnectionFactory.GetOpenConnection())
+            {
+                connection.Execute(@"insert into BloodGlucoseReadings(ReadingDateTime, Value) values (@ReadingDate, @Value);",
+                  new { ReadingDate = DateTime.UtcNow, Value = 9.8M });
+                connection.Execute(@"insert into BloodGlucoseReadings(ReadingDateTime, Value) values (@ReadingDate, @Value);",
+                  new { ReadingDate = DateTime.UtcNow.AddDays(-1), Value = 4.8M });
+                connection.Execute(@"insert into BloodGlucoseReadings(ReadingDateTime, Value) values (@ReadingDate, @Value);",
+                  new { ReadingDate = DateTime.UtcNow.AddDays(-2), Value = 5.8M });
+                connection.Execute(@"insert into BloodGlucoseReadings(ReadingDateTime, Value) values (@ReadingDate, @Value);",
+                  new { ReadingDate = DateTime.UtcNow.AddDays(-3), Value = 7.8M });
+            }
+
+            return new JsonResult();
+        }
     }
+
+    public class ConnectionFactory
+    {
+        public static DbConnection GetOpenConnection()
+        {
+            var connectionString = ConfigurationManager.ConnectionStrings["DatabaseService"].ConnectionString;
+            var connection = new SqlCeConnection(connectionString);
+                //new SqlConnection(@"Data Source=.\SQLEXPRESS;AttachDbFilename=|DataDirectory|\App_Data\Database1.sdf;Integrated Security=True;User Instance=True");
+            connection.Open();
+
+            return connection;
+        }
+    }
+
 }
